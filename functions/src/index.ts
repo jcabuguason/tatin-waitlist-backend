@@ -1,16 +1,26 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * import {onCall} from "firebase-functions/v2/https";
- * import {onDocumentWritten} from "firebase-functions/v2/firestore";
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+import { setGlobalOptions } from "firebase-functions";
+import { onRequest } from "firebase-functions/https";
 
-import {setGlobalOptions} from "firebase-functions";
-import {onRequest} from "firebase-functions/https";
-import * as logger from "firebase-functions/logger";
+require("dotenv").config();
 
+export const hello = onRequest((req, res) => {
+  const accountSid = process.env.TWILIO_USER_ID;
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+  console.log("hello");
+
+  console.log(accountSid);
+  console.log("TOKEN: " + authToken);
+  const client = require("twilio")(accountSid, authToken);
+  client.messages
+    .create({
+      body: "You are now the 57th customer of the day! Please click the following link to view your status in-line",
+      to: "+19054625839",
+      from: "+14482421518",
+    })
+    .then((message: { sid: any }) => console.log(message.sid));
+
+  res.send("Cloud Functions Sent Message 🚀");
+});
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript
 
